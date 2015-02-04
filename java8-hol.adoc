@@ -1,0 +1,23 @@
+= Java 8 Hands on Lab
+Magdalena Petrova, Silviya Brayanova, Ivan St. Ivanov
+v0.1, May 1, 2015
+:doctype: book
+:toc:
+:toclevels: 3
+:imagesdir: images
+
+include::chapters/introduction.adoc[]
+
+include::chapters/lambdas.adoc[]
+
+include::chapters/streamapi.adoc[]
+
+include::chapters/datetime.adoc[]
+
+include::chapters/optional.adoc[]
+
+include::chapters/concurrency.adoc[]
+
+include::chapters/defaultmethods.adoc[]
+
+include::chapters/newapis.adoc[]
