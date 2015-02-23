@@ -1,1 +1,263 @@
 == The Date and Time API
+
+The new Date Time API in java 8 include new classes and utility method which made working with date and time easier than before.
+
+The main API for dates, times, instants, periods and duration are included in package `java.time`
+
+
+=== The new Date Time classes  : 
+
+IMPORTANT: Date Time objects are immutable.
+
+- `LocalDate` –      Represents a date without timezone, often viewed as year-month-day.
+
+- `LocalTime` –      Time of day time without time-zone.
+
+- `LocalDateTime` –  Includes date and time without time-zone.
+
+- `ZonedDateTime` -  It represents date-time with a time-zone in the ,such as 2007-12-03T10:15:30+01:00 Europe/Paris. 
+
+- `OffsetDateTime` - Date and time with a corresponding time zone offset from Greenwich/UTC, without a time zone ID.
+
+- `OffsetTime` -     Time with  time zone offset from Greenwich/UTC, without a time zone ID.
+
+=== Classes for Timezone:
+- `ZoneId` - A time-zone ID, such as Europe/Paris
+
+- `ZoneOffset` - this is time zone offset from Greenwich/UTC time
+
+=== Class : Instant 
+It represents time in `nanoseconds`. The method `toInstant` can be used in `java.util.Date` for converting of the Date from the old to the new date time API.
+
+*For example:*
+[source, java]
+----
+Date date = new Date();
+Instant instant= date.toInstant();
+LocalDateTime dateTime = ZonedDateTime.ofInstant(instant, timeZone ); 
+----
+=== Enums:
+Package : `java.time.temporal.ChronoUnit` includes enums for  *“days”*, *“hours”* , *“months”*, like: 
+
+- `ChronoUnit.WEEKS`
+- `ChronoUnit.MONTHS`
+- `ChronoUnit.YEARS`
+- `ChronoUnit.DECADES`
+
+There’s also the `java.time.DayOfWeek` and `java.time.Month` enums.  *For example: DayOfWeek.MONDAY*
+
+=== Class Clock
+
+Clock can be used instead of `System.currentTimeMillis()` .
+
+Class Clock and its methods *_fixed_* or *_offset_*  can be used in test scenarios where the time is need to be changed.
+
+=== Classes for period and duration 
+-  `Period` - It represents periods , like: *2 years, 3 months and 4 days*
+-  `Duration` - This is amount of time in terms of *_hours, seconds, minutes, nanoseconds_* . *For example: “54.5 minutes”*
+
+=== Class java.time.temporal.TemporalAdjusters
+This class contains a standard set of adjusters, available as static methods. These include:
+
+- Finding the *first* or *last day of the month* -   _firstDayOfMonth()_, _lastDayOfMont()_
+- Finding the *first day of next month* -  _firstDayOfNextMonth()_
+- Finding the *first or last day of the year* - _firstDayOfYear()_
+- Finding the *first day of next year* - _firstDayOfNextYear()_
+- Finding the *first or last day-of-week within a month* , such as *"first Wednesday in June"*
+- Finding the *next or previous day-of-week*, such as *"next Thursday"* -  _next(DayOfWeek), nextOrSame(DayOfWeek), previous(DayOfWeek), previousOrSame(DayOfWeek)_
+
+=== Class: DateTimeFormatter
+This class formats the date for printing and parsing.
+
+
+==== Most of the new date time classes and methods are demonstrate at the example bellow
+
+===== Task Description:
+
+
+There is a conference after few months. All team involved in the organization of the conference have a meeting every Monday on certain time . 
+There is a remainder which fifteen minutes before prints the following information message: 
+_“This is monthly meeting remainder which is displayed every Monday fifteen minutes before: <here is the meeting time>” ._  After that the remainder should to calculate the date and time of the next meeting. The remainder should be deactivated after the last Monday before the conference.
+For testing of the remainder and simulation of the fast-forwarding time  class “Clock” should be used. 
+
+The full code of the example is available in file https://github.com/slbedu/java8-hol/blob/DateTimeAPI/chapters/ConferenceRemainder.java
+
+
+*_Solution_*
+
+Create conference remainder and start it
+
+[source, java]
+----
+public static void main(String[] args) {
+   ConferenceRemainder conferenceRemainderBulgaria = new ConferenceRemainder(ZoneId.of("Europe/Sofia"), 18, 30);		
+   conferenceRemainderBulgaria.startRemainder();
+}
+
+----
+
+
+Initialize the remainder with information about the conference start date and time, zone id of the team's location and the start meeting time.
+
+[source, java]
+----
+
+private ZonedDateTime conferenceDateAndTime ;		
+private ZonedDateTime startMeetingDateAndTime ;	
+int startMeetingHours , startMeetingMinutes;		
+private ZoneId zoneIdOfCurrentLocation;	
+ 
+public ConferenceRemainder( ZoneId zoneIdOfCurrentLocation ,int startMeetingHours , int startMeetingMinutes ){
+   this.zoneIdOfCurrentLocation = zoneIdOfCurrentLocation;
+   conferenceDateAndTime = ZonedDateTime.of(2015, 6, 20, 11, 15, 00, 00, zoneIdOfCurrentLocation);	
+   this.startMeetingHours = startMeetingHours;
+   this.startMeetingMinutes = startMeetingMinutes;
+}
+
+----
+
+
+
+When the remainder is started , it first read the current time according the corresponding timezone and calculate the start date and time for the first team meeting.For testing of the remainder functionality “fast forward time” is simulated, like in a cycle the clock is moved one minutes forward. The remainder display information message every time when the current time is 15 minutes before the start of the meeting, after that the start date and time for the next meeting is calculated. The last execution of the remainder is at the last “Monday”before the date of the conference.
+
+[source, java]
+----
+private ZonedDateTime currentDateAndTime;	
+
+DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss VV");
+	
+public void startRemainder(){	
+		
+    //Initialize the clock with the current time with corresponding time zone of the team's location
+    Clock currentTimeClock = Clock.system(zoneIdOfCurrentLocation);
+    currentDateAndTime = ZonedDateTime.now( currentTimeClock );
+    System.out.println( "Weekly meeting. It runs every Monday.");
+    System.out.println( "Started at : " + currentDateAndTime +" "+ currentDateAndTime.getZone());		
+
+    // initialize the start meeting date and time with the date of the first "Monday" 
+    initStartMeetingDateAndTime();
+    boolean running = true;
+    while( running ){
+         // Check if the remainder is still valid; Start meeting date and time is calculated as 
+          occurred the last "Monday" before the conference date
+          if( currentDateAndTime.isBefore(startMeetingDateAndTime)){				
+              //check if current date and time is 15 minutes before the meeting
+                if(currentDateAndTime.until(startMeetingDateAndTime, ChronoUnit.MINUTES) == 15 ){
+                    showRemainder( );
+                    setNextStartMeetingDateAndTime();
+                 }
+
+           //Stop the remainder, the last "Monday" before the conference date is reached
+            }else{	
+                System.out.println( "The conference date is on " + conferenceDateAndTime.format(formatter) );
+                System.out.println( "Now is : "+ currentDateAndTime.format(formatter)  );
+                System.out.println( "The last meeting date before the conference is reached. Remainder is stopped.");		
+                running = false;
+            }
+
+          // Move the current time with one minutes. This simulate fast forward time.
+           currentTimeClock = Clock.fixed(currentTimeClock.instant().plus(1, ChronoUnit.MINUTES), currentDateAndTime.getZone());
+           currentDateAndTime = ZonedDateTime.now( currentTimeClock );
+      }
+		
+}
+
+----
+
+
+The method bellow initializes start meeting date time to the current Monday ( if today is Monday, before the meeting time ) or to the next Monday if the meeting time for today is already gone. 
+
+[source, java]
+----
+private void initStartMeetingDateAndTime() {
+    ZonedDateTime monday= null;
+    // check if today is Monday 
+     if(DayOfWeek.MONDAY.getValue() == currentDateAndTime.get(ChronoField.DAY_OF_WEEK) &&
+        currentDateAndTime.get(ChronoField.HOUR_OF_DAY) <= startMeetingHours && 
+        currentDateAndTime.get(ChronoField.MINUTE_OF_HOUR) < startMeetingMinutes ) { 
+
+        monday = currentDateAndTime.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY)); 
+    }else {	
+        // The meeting time is already gone. Start meeting time should be the next Monday
+        monday = currentDateAndTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY)); 
+    }
+
+    //if the "monday" is before the conference date, then set it for start meeting date
+    setStartMeetingDateAndTime( monday );
+
+    System.out.println( "initStartMeetingTime: Curreint time is: " + currentDateAndTime);
+    System.out.println( "startMeetingTime is: " + startMeetingDateAndTime);
+}
+----
+
+The remainder is active until the last Monday, before the conference, that's why the start meeting date and time is set only if the date of  "monday" is before the conference date.
+	
+[source, java]
+----
+private void setStartMeetingDateAndTime( ZonedDateTime monday ){
+//start meeting date and time is not set if date of 'moday' is after the conference date
+    if( monday.isBefore(conferenceDateAndTime)) {
+        startMeetingDateAndTime = ZonedDateTime.ofInstant(monday.toInstant(), currentDateAndTime.getZone()); 
+       // add the start meting time to the start meeting date
+        addStartMeetingTimeToStartMeetingDate ();
+     }
+}
+----
+
+This method add the start meeting time to the start meeting date
+
+[source, java]
+----
+private void addStartMeetingTimeToStartMeetingDate(){			    
+     startMeetingDateAndTime = startMeetingDateAndTime.withHour(startMeetingHours);
+     startMeetingDateAndTime = startMeetingDateAndTime.withMinute(startMeetingMinutes);
+}	
+----
+
+Calculate the date and time for the next meeting, which is the next Monday before the conference.
+
+[source, java]
+----
+	
+private void setNextStartMeetingDateAndTime() {		
+    //To use a TemporalAdjuster use the "with" method. This method returns an adjusted copy of the date-time. 
+    ZonedDateTime nextMonday =  currentDateAndTime.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+    
+    //if the "nextMonday" is before the conference date, then set it for start meeting date
+    setStartMeetingDateAndTime( nextMonday );		
+
+    System.out.println( "**********************************************");
+    System.out.println( "Next start meeting time is on : " + startMeetingDateAndTime.format(formatter));
+    System.out.println( "**********************************************");
+}
+
+----
+
+15 minutes before the meeting the remainder print a message with information about the meeting.
+
+[source, java]
+----
+
+private void showRemainder( ){
+
+    //print the remainder message with information about the current date and time 
+    System.out.println( "\nToday is : "+ currentDateAndTime.getDayOfWeek().name()+ " - " + currentDateAndTime.format(formatter));
+    System.out.println("There are 15 minutes to the meeting : ");
+
+    // print details for the meeting which include the type of the meeting and start meeting time
+    System.out.println("This is monthly meeting remainder which is displayed every Monday fifteen minutes before: "+
+                                                                                        startMeetingDateAndTime.format(DateTimeFormatter.ofPattern("hh:mm VV")) )
+    System.out.println("______________________________________________________\n \n");
+
+}
+
+----
+
+
+===== Exercise:
+Change the remainder in following way.
+The meeting of the teams involved at the organization of the conference is at the first and at last “Monday”of the month.
+15 minutes before the meeting the message bellow should be printed.
+_“This is monthly meeting remainder which is displayed at the fist and last Monday of the month  fifteen minutes before: <here is the meeting time>”_.  
+When the “remainder”is started it first should calculate all start meeting dates until the date of the conference. 
+
