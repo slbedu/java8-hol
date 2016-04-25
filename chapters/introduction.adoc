@@ -1,2 +1,16 @@
 == Introduction
 
+The Java Language and Platform have matured a lot in the last 20 years.
+Born as a blue collar language, which can be understood and used by the average developer, Java stayed like that throughout all these years to become top choice for contemporary developers and projects.
+With every new release the language and platform engineers managed to keep the delicate balance between bringing in new features and capabilities, while maintaining the backward compatibility and the simplicity.
+
+Looking at Java's 20-year history, one can identify two big groups of releases.
+The Java architects Brian Goetz and Mark Reinhold have identified those groups as evolutionary and revolutionary.
+Java 5 might seem as the first revolutionary release – it brought things like generics, annotations, enums, static imports, autoboxing and unboxing of primitive types, the enhanced foreach loop and varargs.
+But don't forget J2SE 1.2 before it.
+It introduced the Just In Time (JIT) compilation of the interpreted bytecode and the collection framework among others.
+
+After two evolutionary versions (Java 6 and 7), Java SE 8 came out with many long anticipated changes.
+As Oracle already announced this April the end of public updates of Java SE 7, it is high time the Java developers become aware of what is new in version 8 and how the new features should be applied to the existing and upcoming projects.
+
+This Hands on Lab will guide you in finding which those features are and why and how you should use them.

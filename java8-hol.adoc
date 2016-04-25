@@ -5,6 +5,8 @@ v0.1, May 1, 2015
 :toc:
 :toclevels: 3
 :imagesdir: images
+:source-highlighter: coderay
+:icons: font
 
 include::chapters/introduction.adoc[]
 

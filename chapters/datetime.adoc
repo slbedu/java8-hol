@@ -8,13 +8,13 @@ Previous to Java 8, to calculate the time one day in the future you would need t
 
 
 [source, java]
-----  	
+----
  Date currentDate = new Date (System.currentTimeMillis());
  Date nextDay = new Date( currentDate.getTime() + 1 * 24 * 60 * 60 * 1000); // add 24 hours
-----    	
-    	
-    	
-    	
+----
+
+
+
 In Java 8, you can more simply write the following:
 
 [source, java]
@@ -31,10 +31,10 @@ You also can use the followign well-named methods such as plusDays, plusMonths, 
 3 LocalDate nextMonth = today.plusMonths(1);
 4 LocalDate aMonthAgo = today.minusMonths(1);
 ----
-IMPORTANT: 
-Еach method returns a different instance of LocalDate.This is because the new Date-Time types are immutable. 
+IMPORTANT:
+Еach method returns a different instance of LocalDate.This is because the new Date-Time types are immutable.
 
-=== The new Date Time classes  : 
+=== The new Date Time classes  :
 
 
 
@@ -44,7 +44,7 @@ IMPORTANT:
 
 - `LocalDateTime` –  Includes date and time without time-zone.
 
-- `ZonedDateTime` -  It represents date-time with a time-zone in the ,such as 2007-12-03T10:15:30+01:00 Europe/Paris. 
+- `ZonedDateTime` -  It represents date-time with a time-zone in the ,such as 2007-12-03T10:15:30+01:00 Europe/Paris.
 
 - `OffsetDateTime` - Date and time with a corresponding time zone offset from Greenwich/UTC, without a time zone ID.
 
@@ -55,7 +55,7 @@ IMPORTANT:
 
 - `ZoneOffset` - this is time zone offset from Greenwich/UTC time
 
-=== Class : Instant 
+=== Class : Instant
 It represents time in `nanoseconds`. The method `toInstant` can be used in `java.util.Date` for converting of the Date from the old to the new date time API.
 
 *For example:*
@@ -63,10 +63,10 @@ It represents time in `nanoseconds`. The method `toInstant` can be used in `java
 ----
 Date date = new Date();
 Instant instant= date.toInstant();
-LocalDateTime dateTime = ZonedDateTime.ofInstant(instant, timeZone ); 
+LocalDateTime dateTime = ZonedDateTime.ofInstant(instant, timeZone );
 ----
 === Enums:
-Package : `java.time.temporal.ChronoUnit` includes enums for  *“days”*, *“hours”* , *“months”*, like: 
+Package : `java.time.temporal.ChronoUnit` includes enums for  *“days”*, *“hours”* , *“months”*, like:
 
 - `ChronoUnit.WEEKS`
 - `ChronoUnit.MONTHS`
@@ -81,7 +81,7 @@ Clock can be used instead of `System.currentTimeMillis()` .
 
 Class Clock and its methods *_fixed_* or *_offset_*  can be used in test scenarios where the time is need to be changed.
 
-=== Classes for period and duration 
+=== Classes for period and duration
 -  `Period` - It represents periods , like: *2 years, 3 months and 4 days*
 -  `Duration` - This is amount of time in terms of *_hours, seconds, minutes, nanoseconds_* . *For example: “54.5 minutes”*
 
@@ -99,7 +99,7 @@ This class contains a standard set of adjusters, available as static methods. Th
 This class formats the date for printing and parsing.
 
 
-== Exercise
+=== Exercise
 
 From 01.01.2017 from 16.00 (Bulgarian time ) start film festival. Every day there is projection in Sofia and Berlin of one movie from the list, like the first movie projection is on 01.01.2017, the second movie will be projected on 02.01.2017 and etc.
 
@@ -119,21 +119,21 @@ Movie [title=Animal Crackers, year=1930, duration=123] date: 02.01.2017 : Bulgar
 private static void printMovieProjectionData(List<Movie>movies){
     	ZoneId zoneIDBerlin = ZoneId.of("Europe/Berlin");
     	LocalDateTime  startDateTime = LocalDateTime.of(2017, 1, 1, 17, 0) ;
-    	DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd-M-yyyy hh:mm:ss a"); 
-    	
+    	DateTimeFormatter formater = DateTimeFormatter.ofPattern("dd-M-yyyy hh:mm:ss a");
+
     	for (Movie movie : movies) {
           int duration = movie.getDuration();
           LocalDateTime  endDateTime = startDateTime.plusMinutes(duration);
-          
+
           System.out.println( movie);
           System.out.println("Sofia Start Date and Time :"+ startDateTime.format(formater)  + " End Date and Time : "+ endDateTime.format(formater));
-          System.out.println("Berlin Start Date and Time :"+ ZonedDateTime.of(startDateTime, zoneIDBerlin).format(DateTimeFormatter.ISO_INSTANT)+ 
+          System.out.println("Berlin Start Date and Time :"+ ZonedDateTime.of(startDateTime, zoneIDBerlin).format(DateTimeFormatter.ISO_INSTANT)+
         		             " Date and End Time : "+  ZonedDateTime.of(endDateTime, zoneIDBerlin).format(DateTimeFormatter.ISO_INSTANT));
-          
-          startDateTime = startDateTime.plusDays(1);          
-          
+
+          startDateTime = startDateTime.plusDays(1);
+
           System.out.println();
-          
+
         }
     }
 ----
